@@ -1,5 +1,6 @@
 import { Bricolage_Grotesque, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import AppSessionProvider from "@/components/SessionProvider";
 
 const displayFont = Bricolage_Grotesque({
   variable: "--font-display",
@@ -25,7 +26,9 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${displayFont.variable} ${bodyFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <AppSessionProvider>{children}</AppSessionProvider>
+      </body>
     </html>
   );
 }
