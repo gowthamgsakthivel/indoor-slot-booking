@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, Bell, Activity, Download } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -98,12 +99,13 @@ export default async function OrderDetailPage({ params }) {
         </header>
 
         <section className="relative overflow-hidden rounded-[28px] border border-white/10 bg-black/40">
-          <img
+          <Image
             src="/images/my-orderimg.png"
             alt="Badminton court"
-            className="h-60 w-full object-cover sm:h-72"
-            loading="eager"
-            decoding="async"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/35 to-transparent" />
           <div className="absolute bottom-5 left-5 right-5 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">

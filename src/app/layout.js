@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         <AppSessionProvider>
           <TopHeader />
-          {children}
+          <div className="app-shell">{children}</div>
           <BottomNav />
         </AppSessionProvider>
       </body>

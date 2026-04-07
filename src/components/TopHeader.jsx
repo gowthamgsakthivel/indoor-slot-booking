@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User } from "lucide-react";
@@ -51,9 +52,12 @@ export default function TopHeader() {
             aria-label="Profile"
           >
             {session?.user?.image ? (
-              <img
+              <Image
                 src={session.user.image}
                 alt="Profile"
+                width={40}
+                height={40}
+                sizes="40px"
                 className="h-full w-full rounded-full object-cover"
               />
             ) : (

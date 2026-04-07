@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useState } from "react";
 
 const difficultyOptions = ["Beginner", "Advanced", "Pro"];
@@ -184,10 +185,13 @@ export default function CreateGroupModal({ onClose, onCreate }) {
             <div className="mt-4 grid grid-cols-2 gap-3">
               <div className="group relative flex items-center gap-3 rounded bg-surface-container-highest/40 p-3">
                 <div className="h-8 w-8 overflow-hidden rounded-full bg-stone-800">
-                  <img
+                  <Image
                     className="h-full w-full object-cover"
                     alt="Marcus Thorne"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXptVfdbPT2h7eusCxu2JJiu3kLqCrioZyIoKgzwkLWacy_LuH5MwjVzRSGYVfouXE7a33WFgqtz-oK0HCFrqx42FfRAJ7h25BlADfwLiaibO3xsIY0ZkDqa_a6nFA90Fj9hOM96xk5rkN2LJVPgai-qlmd-Rs9oe1xey2q2oETyArsInSxuWl2XL63ytbrdXJMCIRlZDykRWSMzfpIQRHlTXWr24AJ-ytCxSUj6354JxqERbgh49UH27LJS81sFMrT44XbOiSk8e0"
+                    width={32}
+                    height={32}
+                    sizes="32px"
                   />
                 </div>
                 <div>
@@ -206,10 +210,13 @@ export default function CreateGroupModal({ onClose, onCreate }) {
 
               <div className="group relative flex items-center gap-3 rounded bg-surface-container-highest/40 p-3">
                 <div className="h-8 w-8 overflow-hidden rounded-full bg-stone-800">
-                  <img
+                  <Image
                     className="h-full w-full object-cover"
                     alt="Sarah Jenkins"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLoG9I33kS_PnVNlgDS-geRfWYfM8GftC4kEU0Cs-9UKfEtbDzVhtiffl-kXL2-Qp52pmCjc5tV5FyZ7Jhk2OZAT0j32VxgO-1_1Zz8s11baiNL4oFJEj6Yq1RambW4sBPckQz8Owtu1-u9YbwTfe1I0JJEO5TrqOBsMPBLG4wT0liUeMEqulCCgI5PMLTdZcAfwJ2sCskFxE17bjOv3oHNv1WHVTnb363oQ0fdVsmwwGfgR5DKu1EnZyaY4tq7MJ5IXEkWXULZizD"
+                    width={32}
+                    height={32}
+                    sizes="32px"
                   />
                 </div>
                 <div>

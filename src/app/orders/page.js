@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
@@ -73,11 +74,12 @@ export default function OrdersPage() {
                   className="group flex items-center gap-4 rounded-[26px] border border-white/10 bg-[#131313] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.45)] transition hover:-translate-y-0.5 hover:border-white/20"
                 >
                   <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-white/10">
-                    <img
+                    <Image
                       src={getCourtImage(order.court)}
                       alt={order.court || "Court"}
-                      className="h-full w-full object-cover"
-                      loading="lazy"
+                      fill
+                      sizes="80px"
+                      className="object-cover"
                     />
                   </div>
                   <div className="flex flex-1 items-center justify-between gap-3">

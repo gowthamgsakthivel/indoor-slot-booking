@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 const defaultMembers = [];
 
 export default function GroupCard({
@@ -72,12 +74,15 @@ export default function GroupCard({
                 key={`${member.alt}-${index}`}
                 className={member.active ? "relative group/avatar" : ""}
               >
-                <img
+                <Image
                   alt={member.alt}
                   className={`h-12 w-12 rounded-lg border border-white/10 transition-all ${
                     member.dim ? "grayscale hover:grayscale-0" : ""
                   }`}
                   src={member.src}
+                  width={48}
+                  height={48}
+                  sizes="48px"
                 />
                 {member.active && (
                   <div className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-surface-container-high bg-primary" />

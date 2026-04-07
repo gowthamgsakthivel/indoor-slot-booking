@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
@@ -18,14 +19,8 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-(--background) text-white">
-      <main className="mx-auto flex w-full max-w-md flex-col gap-8 px-6 pb-28 pt-10">
-        <header className="flex items-center justify-between">
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50">
-              Profile
-            </p>
-            <h1 className="text-display mt-2 text-3xl font-black">Your Account</h1>
-          </div>
+      <main className="mx-auto flex w-full max-w-md flex-col gap-8 px-6 pb-28 pt-0">
+        <header className="flex items-center gap-4">
           <Link
             href="/"
             className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/70"
@@ -33,15 +28,24 @@ export default function ProfilePage() {
           >
             <ChevronRight size={18} className="rotate-180" />
           </Link>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/50">
+              Profile
+            </p>
+            <h1 className="text-display mt-2 text-3xl font-black">Your Account</h1>
+          </div>
         </header>
 
         <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 overflow-hidden rounded-full border border-(--orange)/30 bg-[#1c140d] text-(--orange) shadow-[0_0_18px_rgba(255,107,0,0.2)]">
               {session?.user?.image ? (
-                <img
+                <Image
                   src={session.user.image}
                   alt={session.user.name || "Profile"}
+                  width={64}
+                  height={64}
+                  sizes="64px"
                   className="h-full w-full object-cover"
                 />
               ) : (

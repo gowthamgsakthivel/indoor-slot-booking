@@ -170,7 +170,7 @@ export default function BookPage() {
     .filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-(--background) font-sans text-white pb-36 grid-dark relative selection:bg-(--orange) selection:text-black">
+    <div className="min-h-screen bg-(--background) font-sans text-white pb-0 grid-dark relative selection:bg-(--orange) selection:text-black">
 
       {/* 1. Immersive Hero Image Header */}
       <div className="relative w-full h-[30vh] min-h-62.5 overflow-hidden">
@@ -232,20 +232,20 @@ export default function BookPage() {
         {/* 3. 24/7 Segmented Timeline */}
         <section className="mb-12">
           <div ref={slotInfoRef}>
-            <div className="flex items-center justify-between gap-2 mb-4">
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight">2. Select Hours</h2>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2 mb-4 flex-nowrap">
+              <h2 className="text-lg sm:text-2xl font-bold tracking-tight whitespace-nowrap">2. Select Hours</h2>
+              <div className="flex items-center gap-1.5 flex-nowrap">
                 <button
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[9px] sm:text-[10px] font-semibold text-white/60 hover:bg-white/10"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[8px] sm:text-[10px] font-semibold text-white/60 hover:bg-white/10 whitespace-nowrap"
                   onClick={() => setShowSlotInfo((prev) => !prev)}
                   title="Each selected hour is a 1-hour slot (e.g., 5 pm means 5-6 pm)."
                   type="button"
                 >
-                  <Info size={14} className="text-(--orange)" />
-                  1-hour slots
+                  <Info size={12} className="text-(--orange)" />
+                  1-hour
                 </button>
-                <div className="inline-flex items-center rounded-full border border-(--orange)/30 bg-(--orange)/10 px-2 py-1">
-                  <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.2em] text-(--orange) uppercase">24/7 Access</span>
+                <div className="inline-flex items-center rounded-full border border-(--orange)/30 bg-(--orange)/10 px-2 py-1 whitespace-nowrap">
+                  <span className="text-[8px] sm:text-[10px] font-bold tracking-[0.2em] text-(--orange) uppercase">24/7</span>
                 </div>
               </div>
             </div>
@@ -403,9 +403,9 @@ export default function BookPage() {
 
       </main>
 
-      {/* 5. Fixed Checkout / Action Bar */}
-      <div className="fixed bottom-0 inset-x-0 bg-[#0c0c0e]/95 backdrop-blur-2xl border-t border-white/10 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] z-50 shadow-[0_-20px_40px_rgba(0,0,0,0.6)] animate-fade-up">
-        <div className="w-full max-w-4xl mx-auto flex justify-between items-center gap-4">
+      {/* 5. Checkout / Action Bar */}
+      <div className="mx-auto mt-6 w-full max-w-4xl border-t border-white/10 bg-[#0c0c0e]/95 p-6 shadow-[0_-20px_40px_rgba(0,0,0,0.6)] animate-fade-up">
+        <div className="flex justify-between items-center gap-4">
           <div className="flex flex-col">
             <p className="text-white/50 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-1">
               {selectedTimes.length} hrs • Court {selectedCourt || '-'}

@@ -18,7 +18,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 inset-x-0 bg-[#0c0c0e]/95 backdrop-blur-xl border-t border-white/5 z-50 flex justify-center pb-[env(safe-area-inset-bottom)]">
-      <ul className="flex w-full max-w-md justify-between items-center px-6 h-20 relative">
+      <ul className="flex w-full max-w-md justify-between items-center px-6 h-[var(--app-nav-height)] relative">
         <li>
           <Link href="/" className={navClass("/")}
             aria-current={isActive("/") ? "page" : undefined}

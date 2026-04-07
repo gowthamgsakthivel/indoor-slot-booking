@@ -222,7 +222,7 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen grid-dark bg-(--background) flex flex-col relative pb-32">
       {/* Top Header */}
-      <header className="flex items-center px-6 pt-12 pb-4">
+      <header className="flex items-center px-6 pt-0 pb-4">
         <button className="text-(--orange) p-2 -ml-2" onClick={() => window.history.back()}>
           <ArrowLeft size={24} />
         </button>

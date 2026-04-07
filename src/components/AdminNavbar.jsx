@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AdminNavbar() {
   return (
     <header className="fixed right-0 top-0 z-40 h-16 w-[calc(100%-16rem)] border-b border-white/5 bg-stone-950/80 backdrop-blur-md">
@@ -23,10 +25,13 @@ export default function AdminNavbar() {
           <div className="h-6 w-px bg-white/10" />
           <div className="flex items-center gap-3">
             <span className="text-xs font-medium text-stone-400">Admin Console</span>
-            <img
+            <Image
               alt="Admin Profile"
               className="h-8 w-8 rounded-full ring-2 ring-orange-600/20"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuDduy4RI2jMflzRzHDfYoWPf6jaVjN276d-cVJB7gG3kAnFLMMMOnFn7JOlBlKXszYPm6pR2TlyxdyEE54XkwqmMK79tXAdMNcA_kxpECBiX3q6rPT7bMfMWmIkMHMFEyrDH81g2FZkEuoKgnc0vI4jTcuOTBBIwHezyDpbs2YYuDdgqIZ4nEbG9w8VBForwUcM6kmccFy1qc71lbTUG-1A-YF3N_2dAqDGYHqYZvL7f6JysINekv0u3WOI8BiLe-Aet3S6NVO5oYh9"
+              width={32}
+              height={32}
+              sizes="32px"
             />
           </div>
         </div>
