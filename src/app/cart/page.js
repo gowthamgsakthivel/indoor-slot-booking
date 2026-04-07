@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -20,6 +18,7 @@ export default function CheckoutPage() {
   const [scriptReady, setScriptReady] = useState(false);
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState("");
+  const [hasCart, setHasCart] = useState(false);
   const [booking, setBooking] = useState({
     dateLabel: "",
     court: "Court 01",
@@ -73,11 +72,14 @@ export default function CheckoutPage() {
               ? nextCart.baseAmount
               : nextCart.amount
           );
+          setHasCart(true);
           setBooking((prev) => ({
             ...prev,
             ...nextCart,
             ...feeInfo,
           }));
+        } else {
+          setHasCart(false);
         }
       };
 
@@ -208,7 +210,10 @@ export default function CheckoutPage() {
         serviceFee: 0,
         tax: 0,
         totalAmount: 0,
+        members: 1,
+        timeSlots: [],
       });
+      setHasCart(false);
     } catch (err) {
       setError(err?.message || "Failed to clear cart");
     }
@@ -238,7 +243,20 @@ export default function CheckoutPage() {
           </p>
         </div>
 
+        {!hasCart && (
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+            <p className="text-sm text-white/70">Your cart is empty.</p>
+            <button
+              className="mt-4 inline-flex items-center gap-2 rounded-full bg-(--orange) px-4 py-2 text-xs font-semibold text-black"
+              onClick={() => router.push("/book")}
+            >
+              Book a court
+            </button>
+          </div>
+        )}
+
         {/* Order Details Card */}
+        {hasCart && (
         <div className="glass-strong rounded-3xl p-6 relative overflow-hidden">
           {/* Background Decorative Element */}
           <div className="absolute top-0 right-0 p-4 opacity-10 transform translate-x-1/4 -translate-y-1/4">
@@ -316,8 +334,10 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+        )}
 
         {/* Action Group */}
+        {hasCart && (
         <div className="flex flex-col">
           {/* Add Details Card */}
           <Link href="/cart/details" className="relative group z-20">
@@ -373,6 +393,7 @@ export default function CheckoutPage() {
             </button>
           </div>
         </div>
+        )}
 
         {/* Footer Meta */}
         <div className="flex justify-center my-6">

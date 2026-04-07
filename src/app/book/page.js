@@ -3,10 +3,31 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ChevronLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronLeft, Info } from "lucide-react";
 
-const days = ["Today", "Tomorrow", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const buildUpcomingDays = (count) => {
+  const today = new Date();
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() + index);
+    const label =
+      index === 0
+        ? "Today"
+        : index === 1
+        ? "Tomorrow"
+        : date.toLocaleDateString("en-US", { weekday: "short" });
+    const dateText = date.toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+    });
+    return {
+      id: `${index}-${date.toDateString()}`,
+      label,
+      dateText,
+    };
+  });
+};
 const courts = [1, 2, 3, 4];
 
 const timeCategories = [
@@ -24,7 +45,10 @@ const allHours = Array.from({ length: 24 }, (_, i) => {
 
 export default function BookPage() {
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState(days[0]);
+  const dayOptions = buildUpcomingDays(7);
+  const [showSlotInfo, setShowSlotInfo] = useState(false);
+  const slotInfoRef = useRef(null);
+  const [selectedDate, setSelectedDate] = useState(dayOptions[0]);
   const [selectedTimes, setSelectedTimes] = useState([]);
   const [selectedCourt, setSelectedCourt] = useState(null);
   const [memberCount, setMemberCount] = useState(1);
@@ -38,6 +62,36 @@ export default function BookPage() {
     setMemberCount((prev) => Math.min(prev, maxMembers));
   }, [maxMembers]);
 
+  useEffect(() => {
+    if (!showSlotInfo) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setShowSlotInfo(false);
+    }, 4000);
+
+    const handleScroll = () => setShowSlotInfo(false);
+    const handlePointerDown = (event) => {
+      if (!slotInfoRef.current) {
+        setShowSlotInfo(false);
+        return;
+      }
+      if (!slotInfoRef.current.contains(event.target)) {
+        setShowSlotInfo(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("pointerdown", handlePointerDown);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
+  }, [showSlotInfo]);
+
   const handleAddToCart = async () => {
     if (!selectedCourt || selectedTimes.length === 0) {
       return;
@@ -50,7 +104,7 @@ export default function BookPage() {
     const duration = `${selectedTimes.length} hr${selectedTimes.length > 1 ? "s" : ""}`;
 
     const cartData = {
-      dateLabel: selectedDate,
+      dateLabel: `${selectedDate.label} • ${selectedDate.dateText}`,
       court: `Court ${selectedCourt}`,
       slot: endLabel ? `${startLabel} - ${endLabel}` : startLabel,
       duration,
@@ -79,8 +133,40 @@ export default function BookPage() {
   };
 
   const totalPrice = selectedTimes.length * 250;
-  const selectedTimeLabels = sortedHours
-    .map((id) => allHours.find((hour) => hour.id === id)?.label)
+  const getContinuousRanges = (hours) => {
+    if (hours.length === 0) {
+      return [];
+    }
+    const ranges = [];
+    let start = hours[0];
+    let prev = hours[0];
+
+    for (let i = 1; i < hours.length; i += 1) {
+      const current = hours[i];
+      if (current === prev + 1) {
+        prev = current;
+        continue;
+      }
+      ranges.push([start, prev]);
+      start = current;
+      prev = current;
+    }
+
+    ranges.push([start, prev]);
+    return ranges;
+  };
+
+  const formatRange = (startHour, endHour) => {
+    const startLabel = allHours.find((hour) => hour.id === startHour)?.label || "";
+    const endLabel = allHours.find((hour) => hour.id === endHour + 1)?.label || "";
+    if (!startLabel) {
+      return "";
+    }
+    return endLabel ? `${startLabel} - ${endLabel}` : startLabel;
+  };
+
+  const selectedTimeLabels = getContinuousRanges(sortedHours)
+    .map(([start, end]) => formatRange(start, end))
     .filter(Boolean);
 
   return (
@@ -121,11 +207,11 @@ export default function BookPage() {
             <h2 className="text-xl font-bold tracking-tight">1. Pick a Date</h2>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x -mx-6 px-6 relative pointer-events-auto">
-            {days.map((day) => {
-              const isActive = selectedDate === day;
+            {dayOptions.map((day) => {
+              const isActive = selectedDate?.id === day.id;
               return (
                 <button
-                  key={day}
+                  key={day.id}
                   onClick={() => setSelectedDate(day)}
                   className={`snap-center min-w-20 flex flex-col items-center justify-center py-2.5 rounded-2xl border transition-all duration-300
                     ${isActive 
@@ -133,8 +219,10 @@ export default function BookPage() {
                       : "bg-[#141414] border-white/5 text-white/50 hover:bg-white/5 hover:text-white"
                     }`}
                 >
-                  <span className="text-[11px] font-bold uppercase tracking-widest">{day}</span>
-                  {isActive && <div className="w-1 h-1 rounded-full bg-black mt-1.5 opacity-50" />}
+                  <span className="text-[11px] font-bold uppercase tracking-widest">{day.label}</span>
+                  <span className={`text-[10px] font-semibold mt-1 ${isActive ? "text-black/70" : "text-white/40"}`}>
+                    {day.dateText}
+                  </span>
                 </button>
               );
             })}
@@ -143,11 +231,30 @@ export default function BookPage() {
 
         {/* 3. 24/7 Segmented Timeline */}
         <section className="mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold tracking-tight">2. Select Hours</h2>
-            <div className="inline-flex items-center rounded-full border border-(--orange)/30 bg-(--orange)/10 px-3 py-1">
-              <span className="text-[9px] font-bold tracking-[0.2em] text-(--orange) uppercase">24/7 Access</span>
+          <div ref={slotInfoRef}>
+            <div className="flex items-center justify-between gap-2 mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight">2. Select Hours</h2>
+              <div className="flex items-center gap-2">
+                <button
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[9px] sm:text-[10px] font-semibold text-white/60 hover:bg-white/10"
+                  onClick={() => setShowSlotInfo((prev) => !prev)}
+                  title="Each selected hour is a 1-hour slot (e.g., 5 pm means 5-6 pm)."
+                  type="button"
+                >
+                  <Info size={14} className="text-(--orange)" />
+                  1-hour slots
+                </button>
+                <div className="inline-flex items-center rounded-full border border-(--orange)/30 bg-(--orange)/10 px-2 py-1">
+                  <span className="text-[9px] sm:text-[10px] font-bold tracking-[0.2em] text-(--orange) uppercase">24/7 Access</span>
+                </div>
+              </div>
             </div>
+
+            {showSlotInfo && (
+              <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-white/70">
+                Each selected hour is a 1-hour slot. Example: 5 pm means 5-6 pm.
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-6 w-full pb-6 relative pointer-events-auto">
@@ -235,7 +342,9 @@ export default function BookPage() {
                 <p className="text-xs uppercase tracking-[0.3em] text-white/50">
                   Booking summary
                 </p>
-                <p className="mt-2 text-lg font-semibold">{selectedDate}</p>
+                <p className="mt-2 text-lg font-semibold">
+                  {selectedDate.label} • {selectedDate.dateText}
+                </p>
               </div>
               <div className="text-right">
                 <p className="text-xs uppercase tracking-[0.3em] text-white/50">Selected</p>

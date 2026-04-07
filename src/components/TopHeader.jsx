@@ -20,10 +20,10 @@ export default function TopHeader() {
     <header className="sticky top-0 z-50 border-b border-white/5 bg-[#0c0c0e]/85 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex flex-col leading-tight">
-          <span className="text-display text-sm font-bold tracking-[0.32em] text-(--orange)">
+          <span className="text-display text-sm font-extrabold tracking-[0.32em] text-(--orange)">
             NAMAKKAL
           </span>
-          <span className="text-display text-xs font-semibold tracking-[0.28em] text-white/85">
+          <span className="text-display text-xs font-bold tracking-[0.28em] text-white/85">
             SPORT CLUB
           </span>
         </Link>
