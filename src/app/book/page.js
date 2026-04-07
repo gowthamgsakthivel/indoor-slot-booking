@@ -337,18 +337,18 @@ export default function BookPage() {
 
         <section className="mb-10">
           <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/50">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-white/50">
                   Booking summary
                 </p>
-                <p className="mt-2 text-lg font-semibold">
+                <p className="mt-2 text-base sm:text-lg font-semibold">
                   {selectedDate.label} • {selectedDate.dateText}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs uppercase tracking-[0.3em] text-white/50">Selected</p>
-                <p className="mt-2 text-sm font-semibold">
+                <p className="text-[10px] uppercase tracking-[0.3em] text-white/50">Selected</p>
+                <p className="mt-2 text-base sm:text-sm md:text-base font-semibold leading-snug">
                   {selectedTimes.length} hrs • Court {selectedCourt || "-"}
                 </p>
               </div>
@@ -369,15 +369,18 @@ export default function BookPage() {
               )}
             </div>
 
-            <div className="mt-6 flex items-center justify-between rounded-2xl border border-white/10 bg-[#141414] px-4 py-3">
+            <div className="mt-6 flex flex-col gap-4 rounded-2xl border border-white/10 bg-[#141414] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-white/50">Players</p>
                 <p className="mt-1 text-sm font-semibold">{memberCount} member(s)</p>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-white/40">
                   Max {maxMembers} players
                 </p>
+                <p className="mt-1 text-[10px] font-semibold text-[#ff7b72]">
+                  If booked more than 1 hr, 8 players max allowed.
+                </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 self-start sm:self-auto">
                 <button
                   className="h-9 w-9 rounded-full border border-white/10 text-white/70 hover:text-white"
                   onClick={() => setMemberCount((prev) => Math.max(1, prev - 1))}
