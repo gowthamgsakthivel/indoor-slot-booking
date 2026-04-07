@@ -6,10 +6,16 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, Edit2, ChevronRight, AlertTriangle, Lock, UserPlus } from "lucide-react";
-import BottomNav from "@/components/BottomNav";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const calculateFees = (baseAmount) => {
+    const safeBase = Number.isFinite(baseAmount) ? baseAmount : 0;
+    const serviceFee = Number((safeBase * 0.02).toFixed(2));
+    const tax = Number((safeBase * 0.05).toFixed(2));
+    const totalAmount = Number((safeBase + serviceFee + tax).toFixed(2));
+    return { baseAmount: safeBase, serviceFee, tax, totalAmount };
+  };
   const [profileComplete, setProfileComplete] = useState(false);
   const [scriptReady, setScriptReady] = useState(false);
   const [paying, setPaying] = useState(false);
@@ -20,6 +26,10 @@ export default function CheckoutPage() {
     slot: "06:00 AM - 07:00 AM",
     duration: "1 hr",
     amount: 500,
+    baseAmount: 500,
+    serviceFee: 10,
+    tax: 25,
+    totalAmount: 535,
     members: 1,
     timeSlots: [],
   });
@@ -57,9 +67,16 @@ export default function CheckoutPage() {
         }
         const data = await response.json();
         if (data?.cart) {
+          const nextCart = { ...booking, ...data.cart };
+          const feeInfo = calculateFees(
+            Number.isFinite(nextCart.baseAmount)
+              ? nextCart.baseAmount
+              : nextCart.amount
+          );
           setBooking((prev) => ({
             ...prev,
-            ...data.cart,
+            ...nextCart,
+            ...feeInfo,
           }));
         }
       };
@@ -101,7 +118,7 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          amount: booking.amount * 100,
+          amount: (booking.totalAmount || booking.amount) * 100,
           slot: booking.slot,
           plan: "Booking",
         }),
@@ -143,6 +160,9 @@ export default function CheckoutPage() {
               orderId: response.razorpay_order_id,
               paymentId: response.razorpay_payment_id,
               amount: orderData.amount,
+              baseAmount: Math.round((booking.baseAmount || booking.amount) * 100),
+              serviceFee: Math.round((booking.serviceFee || 0) * 100),
+              tax: Math.round((booking.tax || 0) * 100),
               currency: orderData.currency,
               court: booking.court,
               slot: booking.slot,
@@ -184,6 +204,10 @@ export default function CheckoutPage() {
         slot: "06:00 AM - 07:00 AM",
         duration: "1 hr",
         amount: 0,
+        baseAmount: 0,
+        serviceFee: 0,
+        tax: 0,
+        totalAmount: 0,
       });
     } catch (err) {
       setError(err?.message || "Failed to clear cart");
@@ -358,7 +382,6 @@ export default function CheckoutPage() {
         </div>
       </main>
 
-      <BottomNav />
     </div>
   );
 }

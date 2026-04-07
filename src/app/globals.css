@@ -90,6 +90,17 @@ body {
   min-height: 100%;
 }
 
+button,
+a,
+[role="button"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
 .text-display {
   font-family: var(--font-display), system-ui, sans-serif;
 }

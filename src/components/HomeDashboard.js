@@ -1,58 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, User } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
-import BottomNav from "./BottomNav";
+import { Calendar } from "lucide-react";
 
 export default function HomeDashboard() {
-  const { data: session } = useSession();
-  const isAdmin = session?.user?.role === "admin";
-
   return (
     <div className="min-h-screen bg-(--background) flex flex-col text-white pb-24 font-sans relative">
       <div className="absolute top-0 inset-x-0 h-[60vh] court-hero-gradient pointer-events-none opacity-80" />
       <div className="absolute top-0 inset-x-0 h-[60vh] grid-dark pointer-events-none opacity-40 mix-blend-overlay" />
       <div className="absolute top-[40vh] inset-x-0 h-[30vh] bg-linear-to-b from-transparent to-(--background) pointer-events-none" />
 
-      <header className="flex justify-between items-center px-6 pt-8 pb-4 relative z-10 w-full max-w-4xl mx-auto">
-        <div className="flex items-center gap-2">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="drop-shadow-[0_0_8px_rgba(255,107,0,0.8)]">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 2v20" />
-            <path d="M2 12h20" />
-          </svg>
-          <span className="font-bold text-lg tracking-tight">Smash Court</span>
-        </div>
-        <div className="flex items-center gap-3">
-          {isAdmin && (
-            <Link
-              href="/admin"
-              className="rounded-full border border-(--orange)/40 bg-(--orange)/10 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-(--orange)"
-            >
-              Admin
-            </Link>
-          )}
-          {session?.user ? (
-            <button
-              className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 hover:text-white"
-              onClick={() => signOut({ callbackUrl: "/" })}
-            >
-              Sign out
-            </button>
-          ) : (
-            <button
-              className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 hover:text-white"
-              onClick={() => signIn("google", { callbackUrl: "/" })}
-            >
-              Sign in
-            </button>
-          )}
-          <div className="w-10 h-10 rounded-full bg-[#1c140d] border border-(--orange)/20 flex items-center justify-center text-(--orange) shadow-[0_0_15px_rgba(255,107,0,0.15)]">
-            <User size={18} strokeWidth={2.5} />
-          </div>
-        </div>
-      </header>
 
       <main className="flex-1 px-6 w-full max-w-4xl mx-auto relative z-10 flex flex-col pt-8">
         <div className="self-center md:self-start">
@@ -178,8 +135,6 @@ export default function HomeDashboard() {
 
       </main>
 
-      <BottomNav />
-      
     </div>
   );
 }

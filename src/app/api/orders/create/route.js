@@ -13,7 +13,20 @@ export async function POST(request) {
   }
 
   const body = await request.json();
-  const { orderId, paymentId, amount, currency, court, slot, duration, status, members } = body || {};
+  const {
+    orderId,
+    paymentId,
+    amount,
+    baseAmount,
+    serviceFee,
+    tax,
+    currency,
+    court,
+    slot,
+    duration,
+    status,
+    members,
+  } = body || {};
 
   if (!orderId || !amount) {
     return NextResponse.json({ error: "Missing order details" }, { status: 400 });
@@ -31,6 +44,9 @@ export async function POST(request) {
     orderId,
     paymentId,
     amount,
+    baseAmount: Number.isFinite(baseAmount) ? baseAmount : amount,
+    serviceFee: Number.isFinite(serviceFee) ? serviceFee : 0,
+    tax: Number.isFinite(tax) ? tax : 0,
     currency: currency || "INR",
     court,
     slot,

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import BottomNav from "@/components/BottomNav";
 
 const planDetails = {
   plan: "Monthly",
@@ -337,7 +336,6 @@ export default function MemberPage() {
           </section>
         )}
       </main>
-      <BottomNav />
     </div>
   );
 }

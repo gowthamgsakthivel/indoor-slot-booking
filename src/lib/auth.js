@@ -30,11 +30,20 @@ export const authOptions = {
         token.email = email;
         token.role = adminEmails.includes(email) ? "admin" : "user";
       }
+      if (user?.name) {
+        token.name = user.name;
+      }
+      if (user?.image) {
+        token.picture = user.image;
+      }
       return token;
     },
     async session({ session, token }) {
       if (session?.user) {
         session.user.role = token?.role || "user";
+        session.user.email = token?.email || session.user.email;
+        session.user.name = token?.name || session.user.name;
+        session.user.image = token?.picture || session.user.image;
       }
       return session;
     },
