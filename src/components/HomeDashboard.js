@@ -6,13 +6,13 @@ import { Calendar } from "lucide-react";
 
 export default function HomeDashboard() {
   return (
-    <div className="min-h-screen bg-(--background) flex flex-col text-white pb-24 font-sans relative">
+    <div className="min-h-screen bg-(--background) flex flex-col text-white pb-0 font-sans relative">
       <div className="absolute top-0 inset-x-0 h-[60vh] court-hero-gradient pointer-events-none opacity-80" />
       <div className="absolute top-0 inset-x-0 h-[60vh] grid-dark pointer-events-none opacity-40 mix-blend-overlay" />
       <div className="absolute top-[40vh] inset-x-0 h-[30vh] bg-linear-to-b from-transparent to-(--background) pointer-events-none" />
 
 
-      <main className="flex-1 px-6 w-full max-w-4xl mx-auto relative z-10 flex flex-col pt-4">
+      <main className="flex-1 px-6 w-full max-w-4xl mx-auto relative z-10 flex flex-col pt-4 pb-0">
         <div className="self-center md:self-start">
           <div className="inline-flex items-center rounded-full border border-(--orange)/40 bg-(--orange)/10 px-4 py-1.5 backdrop-blur-md shadow-[0_0_15px_rgba(255,107,0,0.15)]">
             <span className="text-[10px] font-bold tracking-[0.2em] text-(--orange) uppercase">

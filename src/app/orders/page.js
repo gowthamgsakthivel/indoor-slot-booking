@@ -42,7 +42,7 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-(--background) text-white grid-dark">
-      <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-6 pb-28 pt-10">
+      <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-6 pb-0 pt-0">
         <section className="px-1">
           <h1 className="text-display text-3xl font-black tracking-tight">My Orders</h1>
           <p className="mt-2 text-sm text-white/60">

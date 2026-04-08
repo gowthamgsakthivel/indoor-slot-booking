@@ -220,7 +220,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen grid-dark bg-(--background) flex flex-col relative pb-32">
+    <div className="min-h-screen grid-dark bg-(--background) flex flex-col relative pb-0">
       {/* Top Header */}
       <header className="flex items-center px-6 pt-0 pb-4">
         <button className="text-(--orange) p-2 -ml-2" onClick={() => window.history.back()}>
@@ -231,7 +231,7 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-6 pt-4 flex flex-col gap-8 mb-20 z-10">
+      <main className="flex-1 px-6 pt-4 flex flex-col gap-8 mb-0 z-10">
         {/* Title Area */}
         <div className="flex flex-col gap-1">
           <h1 className="text-4xl font-black italic tracking-tight">

@@ -2,11 +2,40 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { Home as HomeIcon, ClipboardList, Ticket, ShoppingCart, Plus } from "lucide-react";
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const showNav = useSyncExternalStore(
+    (callback) => {
+      if (typeof window === "undefined") {
+        return () => {};
+      }
+      window.addEventListener("introchange", callback);
+      window.addEventListener("storage", callback);
+      return () => {
+        window.removeEventListener("introchange", callback);
+        window.removeEventListener("storage", callback);
+      };
+    },
+    () => {
+      if (typeof window === "undefined") {
+        return false;
+      }
+      if (pathname !== "/") {
+        return true;
+      }
+      return Boolean(sessionStorage.getItem("hasSeenIntro"));
+    },
+    () => false
+  );
   const isActive = (href) => pathname === href;
+
+  if (!showNav) {
+    return null;
+  }
+
   const navClass = (href) =>
     `flex flex-col items-center gap-1.5 transition-colors ${
       isActive(href)

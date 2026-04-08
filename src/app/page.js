@@ -22,13 +22,13 @@ export default function Home() {
       if (typeof window === "undefined") {
         return "loading";
       }
-      return localStorage.getItem("hasSeenIntro") ? "home" : "splash";
+      return sessionStorage.getItem("hasSeenIntro") ? "home" : "splash";
     },
     () => "loading"
   );
 
   const handleSplashComplete = () => {
-    localStorage.setItem("hasSeenIntro", "true");
+    sessionStorage.setItem("hasSeenIntro", "true");
     window.dispatchEvent(new Event("introchange"));
   };
 

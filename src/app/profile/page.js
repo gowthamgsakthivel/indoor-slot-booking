@@ -19,7 +19,7 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-(--background) text-white">
-      <main className="mx-auto flex w-full max-w-md flex-col gap-8 px-6 pb-28 pt-0">
+      <main className="mx-auto flex w-full max-w-md flex-col gap-8 px-6 pb-6 pt-4">
         <header className="flex items-center gap-4">
           <Link
             href="/"

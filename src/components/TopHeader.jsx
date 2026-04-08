@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 import { User } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 
@@ -10,8 +11,38 @@ export default function TopHeader() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
+  const showHeader = useSyncExternalStore(
+    (callback) => {
+      if (typeof window === "undefined") {
+        return () => {};
+      }
+      window.addEventListener("introchange", callback);
+      window.addEventListener("storage", callback);
+      return () => {
+        window.removeEventListener("introchange", callback);
+        window.removeEventListener("storage", callback);
+      };
+    },
+    () => {
+      if (typeof window === "undefined") {
+        return false;
+      }
+      if (pathname.startsWith("/admin")) {
+        return false;
+      }
+      if (pathname !== "/") {
+        return true;
+      }
+      return Boolean(sessionStorage.getItem("hasSeenIntro"));
+    },
+    () => false
+  );
 
   if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
+  if (!showHeader) {
     return null;
   }
 

@@ -177,7 +177,7 @@ export default function MemberPage() {
 
   return (
     <div className="min-h-screen bg-(--background) text-white">
-      <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 pb-24 pt-10">
+      <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-6 pb-6 pt-6">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-white/50">

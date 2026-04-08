@@ -59,9 +59,9 @@ export default function PersonalDetailsPage() {
   };
 
   return (
-    <div className="min-h-screen grid-dark bg-(--background) flex flex-col relative pb-10">
+    <div className="min-h-screen grid-dark bg-(--background) flex flex-col relative pb-0">
       {/* Top Header */}
-      <header className="flex flex-col pt-12 pb-6 px-6">
+      <header className="flex flex-col pt-4 pb-4 px-6">
         <div className="flex items-center mb-6">
           <Link href="/cart" className="text-(--orange) p-2 -ml-2">
              <ArrowLeft size={24} />
@@ -164,7 +164,7 @@ export default function PersonalDetailsPage() {
       </main>
 
       {/* Bottom Action */}
-      <div className="mt-auto px-6 pt-12 pb-8">
+      <div className="mt-auto px-6 pt-6 pb-6">
         {error && (
           <p className="mb-4 text-sm text-[#ff7b72]">{error}</p>
         )}

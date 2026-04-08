@@ -69,7 +69,7 @@ export default async function OrderDetailPage({ params }) {
 
   return (
     <div className="min-h-screen bg-(--background) text-white overflow-x-hidden">
-      <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 pb-28 pt-6">
+      <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 pb-6 pt-6">
         <header className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <Link
