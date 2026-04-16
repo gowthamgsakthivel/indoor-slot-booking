@@ -42,7 +42,7 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-(--background) text-white grid-dark">
-      <main className="mx-auto flex w-full max-w-md flex-col gap-6 px-6 pb-0 pt-0">
+      <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 pb-0 pt-0 xl:max-w-6xl xl:px-10">
         <section className="px-1">
           <h1 className="text-display text-3xl font-black tracking-tight">My Orders</h1>
           <p className="mt-2 text-sm text-white/60">
@@ -63,15 +63,15 @@ export default function OrdersPage() {
         )}
 
         {status === "ready" && (
-          <section className="flex flex-col gap-4">
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredOrders.length === 0 ? (
-              <p className="text-sm text-white/50">No orders yet.</p>
+              <p className="text-sm text-white/50 sm:col-span-2 lg:col-span-3">No orders yet.</p>
             ) : (
               filteredOrders.map((order) => (
                 <Link
                   key={order._id}
                   href={`/orders/${order._id}`}
-                  className="group flex items-center gap-4 rounded-[26px] border border-white/10 bg-[#131313] p-4 shadow-[0_18px_40px_rgba(0,0,0,0.45)] transition hover:-translate-y-0.5 hover:border-white/20"
+                  className="group flex items-center gap-4 rounded-[26px] border border-white/10 bg-surface-container-low p-4 shadow-[0_18px_40px_rgba(0,0,0,0.45)] transition hover:-translate-y-0.5 hover:border-white/20"
                 >
                   <div className="relative h-20 w-20 overflow-hidden rounded-2xl border border-white/10">
                     <Image
@@ -103,7 +103,7 @@ export default function OrdersPage() {
                       </p>
                     </div>
                     <div className="flex flex-col items-end justify-between gap-3">
-                      <div className="min-w-[72px] text-right tabular-nums">
+                      <div className="min-w-18 text-right tabular-nums">
                         <span className="block text-[11px] uppercase tracking-[0.3em] text-(--orange)/70">
                           Rs
                         </span>

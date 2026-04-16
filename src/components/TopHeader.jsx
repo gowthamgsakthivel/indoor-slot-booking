@@ -11,6 +11,13 @@ export default function TopHeader() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
+  const navItems = [
+    { href: "/", label: "Home" },
+    { href: "/book", label: "Book" },
+    { href: "/orders", label: "Orders" },
+    { href: "/member", label: "Member" },
+    { href: "/cart", label: "Cart" },
+  ];
   const showHeader = useSyncExternalStore(
     (callback) => {
       if (typeof window === "undefined") {
@@ -50,7 +57,7 @@ export default function TopHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-[#0c0c0e]/85 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex w-full max-w-4xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4 xl:max-w-6xl xl:px-10">
         <Link href="/" className="flex flex-col leading-tight">
           <span className="text-display text-sm font-extrabold tracking-[0.32em] text-(--orange)">
             NAMAKKAL
@@ -60,7 +67,24 @@ export default function TopHeader() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-3">
+        <nav className="hidden items-center gap-6 lg:flex">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-xs font-semibold uppercase tracking-[0.22em] transition-colors ${
+                  isActive ? "text-(--orange)" : "text-white/50 hover:text-white"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="flex items-center gap-2 sm:gap-3">
           {isAdmin && (
             <Link
               href="/admin"

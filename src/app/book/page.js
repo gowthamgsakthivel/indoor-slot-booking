@@ -195,7 +195,7 @@ export default function BookPage() {
         </div>
       </div>
 
-      <main className="w-full max-w-4xl mx-auto px-6 relative z-10 -mt-2">
+      <main className="w-full max-w-4xl mx-auto px-6 relative z-10 -mt-2 xl:max-w-6xl xl:px-10">
 
         <p className="text-white/60 text-sm font-medium mb-8 max-w-sm">
           Select your date, pick your hours, and reserve your synthetic court instantly.
@@ -206,7 +206,7 @@ export default function BookPage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold tracking-tight">1. Pick a Date</h2>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x -mx-6 px-6 relative pointer-events-auto">
+          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x -mx-6 px-6 relative pointer-events-auto xl:-mx-10 xl:px-10">
             {dayOptions.map((day) => {
               const isActive = selectedDate?.id === day.id;
               return (
@@ -404,7 +404,7 @@ export default function BookPage() {
       </main>
 
       {/* 5. Checkout / Action Bar */}
-      <div className="mx-auto mt-6 w-full max-w-4xl border-t border-white/10 bg-[#0c0c0e]/95 p-6 shadow-[0_-20px_40px_rgba(0,0,0,0.6)] animate-fade-up">
+      <div className="mx-auto mt-6 w-full max-w-4xl border-t border-white/10 bg-[#0c0c0e]/95 p-6 shadow-[0_-20px_40px_rgba(0,0,0,0.6)] animate-fade-up xl:max-w-6xl xl:px-10">
         <div className="flex justify-between items-center gap-4">
           <div className="flex flex-col">
             <p className="text-white/50 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] mb-1">

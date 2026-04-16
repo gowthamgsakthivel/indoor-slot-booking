@@ -9,7 +9,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-(--background) text-white flex items-center justify-center px-6">
-      <div className="w-full max-w-md rounded-[28px] border border-white/10 bg-[#0c0c0e] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+      <div className="w-full max-w-lg rounded-[28px] border border-white/10 bg-[#0c0c0e] p-8 shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
         <div className="mb-6">
           <p className="text-xs uppercase tracking-[0.3em] text-white/50">
             Secure access

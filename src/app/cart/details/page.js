@@ -90,7 +90,7 @@ export default function PersonalDetailsPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-6 pt-2 flex flex-col gap-6 z-10">
+      <main className="mx-auto flex-1 w-full max-w-4xl px-6 pt-2 flex flex-col gap-6 z-10 xl:max-w-5xl xl:px-10">
         
         {/* Form Group */}
         <div className="flex flex-col gap-5">
