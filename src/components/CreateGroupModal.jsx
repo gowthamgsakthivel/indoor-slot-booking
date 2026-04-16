@@ -66,7 +66,7 @@ export default function CreateGroupModal({ onClose, onCreate }) {
           </div>
         </div>
 
-        <div className="no-scrollbar max-h-[716px] space-y-8 overflow-y-auto p-8">
+        <div className="no-scrollbar max-h-179 space-y-8 overflow-y-auto p-8">
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="font-headline text-xs font-bold uppercase tracking-widest text-on-surface-variant">

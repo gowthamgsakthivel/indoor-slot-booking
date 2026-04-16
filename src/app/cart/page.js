@@ -231,7 +231,7 @@ export default function CheckoutPage() {
         </div>
       </header>
 
-      <main className="flex-1 px-6 pt-4 flex flex-col gap-8 mb-0 z-10">
+      <main className="mx-auto flex-1 w-full max-w-4xl px-6 pt-4 flex flex-col gap-8 mb-0 z-10 xl:max-w-6xl xl:px-10">
         {/* Title Area */}
         <div className="flex flex-col gap-1">
           <h1 className="text-4xl font-black italic tracking-tight">

@@ -30,14 +30,19 @@ export default function BottomNav() {
     },
     () => false
   );
-  const isActive = (href) => pathname === href;
+  const isActive = (href) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(href);
+  };
 
   if (!showNav) {
     return null;
   }
 
   const navClass = (href) =>
-    `flex flex-col items-center gap-1.5 transition-colors ${
+    `flex flex-col items-center gap-1 transition-colors ${
       isActive(href)
         ? "text-(--orange)"
         : "text-white/40 hover:text-white"
@@ -46,14 +51,14 @@ export default function BottomNav() {
     isActive(href) ? "drop-shadow-[0_0_8px_rgba(255,107,0,0.6)]" : "";
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 bg-[#0c0c0e]/95 backdrop-blur-xl border-t border-white/5 z-50 flex justify-center pb-[env(safe-area-inset-bottom)]">
-      <ul className="flex w-full max-w-md justify-between items-center px-6 h-[var(--app-nav-height)] relative">
+    <nav className="fixed bottom-0 inset-x-0 bg-[#0c0c0e]/95 backdrop-blur-xl border-t border-white/5 z-50 flex justify-center pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <ul className="flex w-full max-w-90 justify-between items-center px-4 h-(--app-nav-height) relative sm:max-w-md sm:px-6">
         <li>
           <Link href="/" className={navClass("/")}
             aria-current={isActive("/") ? "page" : undefined}
           >
-            <HomeIcon size={24} strokeWidth={2.5} className={iconClass("/")} />
-            <span className="font-bold text-[10px] tracking-wider mt-0.5">HOME</span>
+            <HomeIcon size={22} strokeWidth={2.5} className={iconClass("/")} />
+            <span className="font-bold text-[9px] tracking-wider mt-0.5">HOME</span>
           </Link>
         </li>
         <li>
@@ -62,18 +67,18 @@ export default function BottomNav() {
             className={navClass("/orders")}
             aria-current={isActive("/orders") ? "page" : undefined}
           >
-            <ClipboardList size={22} strokeWidth={2.5} className={iconClass("/orders")} />
-            <span className="font-bold text-[10px] tracking-wider mt-0.5">ORDERS</span>
+            <ClipboardList size={20} strokeWidth={2.5} className={iconClass("/orders")} />
+            <span className="font-bold text-[9px] tracking-wider mt-0.5">ORDERS</span>
           </Link>
         </li>
-        <li className="relative -top-5">
+        <li className="relative -top-4">
           <Link
             href="/book"
             className="block transform hover:scale-105 transition-transform"
             aria-label="Book a court"
           >
-            <div className="w-14 h-14 bg-(--orange) rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(255,107,0,0.5)] border-4 border-[#0c0c0e]">
-              <Plus size={28} color="black" strokeWidth={3} />
+            <div className="w-12 h-12 bg-(--orange) rounded-full flex items-center justify-center shadow-[0_8px_25px_rgba(255,107,0,0.5)] border-4 border-[#0c0c0e]">
+              <Plus size={24} color="black" strokeWidth={3} />
             </div>
           </Link>
         </li>
@@ -83,8 +88,8 @@ export default function BottomNav() {
             className={navClass("/member")}
             aria-current={isActive("/member") ? "page" : undefined}
           >
-            <Ticket size={22} strokeWidth={2.5} className={iconClass("/member")} />
-            <span className="font-bold text-[10px] tracking-wider mt-0.5">
+            <Ticket size={20} strokeWidth={2.5} className={iconClass("/member")} />
+            <span className="font-bold text-[9px] tracking-wider mt-0.5">
               MEMBER
             </span>
           </Link>
@@ -95,8 +100,8 @@ export default function BottomNav() {
             className={navClass("/cart")}
             aria-current={isActive("/cart") ? "page" : undefined}
           >
-            <ShoppingCart size={22} strokeWidth={2.5} className={iconClass("/cart")} />
-            <span className="font-bold text-[10px] tracking-wider mt-0.5">CART</span>
+            <ShoppingCart size={20} strokeWidth={2.5} className={iconClass("/cart")} />
+            <span className="font-bold text-[9px] tracking-wider mt-0.5">CART</span>
           </Link>
         </li>
       </ul>
