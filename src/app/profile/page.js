@@ -61,6 +61,11 @@ export default function ProfilePage() {
               <p className="text-xs text-white/60">
                 {session?.user?.email || "Signed in"}
               </p>
+              {session?.user?.role === "admin" ? (
+                <span className="mt-2 inline-flex rounded-full border border-(--orange)/40 bg-(--orange)/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-(--orange)">
+                  Admin
+                </span>
+              ) : null}
             </div>
           </div>
         </section>

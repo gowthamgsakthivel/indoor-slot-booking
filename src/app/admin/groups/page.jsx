@@ -3,36 +3,24 @@
 import { useEffect, useState } from "react";
 import AdminSidebar from "@/components/AdminSidebar";
 import AdminNavbar from "@/components/AdminNavbar";
-import CreateGroupModal from "@/components/CreateGroupModal";
 import GroupCard from "@/components/GroupCard";
 
-const stats = [];
-
-const mapGroupToCard = (group, index) => {
-  const capacityTotal = group.maxMembers ?? group.capacity ?? 6;
-  const capacity = Array.isArray(group.members) ? group.members.length : 0;
-  const isFull = capacityTotal > 0 && capacity >= capacityTotal;
-  const courtLabel = group.court || (group.courtId ? `Court ${group.courtId}` : "Court");
-  const timeLabel = group.time || group.slot || "06:00 AM - 07:00 AM";
-  return {
-    id: group._id || group.id || `group-${index}`,
-    badge: courtLabel,
-    time: timeLabel,
-    title: group.name || `Group ${index + 1}`,
-    capacity,
-    capacityTotal,
-    members: [],
-    accent: isFull ? "hover:ring-secondary/20" : "hover:ring-primary/20",
-    isFull,
-    showAddSlot: !isFull,
-  };
-};
-
 export default function AdminGroupsPage() {
-  const [open, setOpen] = useState(false);
   const [groups, setGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [members, setMembers] = useState([]);
+  const [showCreate, setShowCreate] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+  const [newGroupCourt, setNewGroupCourt] = useState("Court 1");
+  const [newGroupTime, setNewGroupTime] = useState("06:00 AM - 07:00 AM");
+  const [newGroupMemberIds, setNewGroupMemberIds] = useState([]);
+  const [activeModal, setActiveModal] = useState(null);
+  const [editGroupName, setEditGroupName] = useState("");
+  const [editGroupCourt, setEditGroupCourt] = useState("");
+  const [editGroupTime, setEditGroupTime] = useState("");
+  const [editGroupMemberIds, setEditGroupMemberIds] = useState([]);
+  const [addMemberIds, setAddMemberIds] = useState([]);
 
   useEffect(() => {
     const loadGroups = async () => {
@@ -52,25 +40,193 @@ export default function AdminGroupsPage() {
       }
     };
 
+    const loadMembers = async () => {
+      try {
+        const response = await fetch("/api/admin/members", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error("Failed to load members");
+        }
+        const data = await response.json();
+        setMembers(Array.isArray(data?.members) ? data.members : []);
+      } catch (err) {
+        setMembers([]);
+      }
+    };
+
     loadGroups();
+    loadMembers();
   }, []);
 
-  const handleCreateGroup = async (payload) => {
-    const response = await fetch("/api/groups", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  const handleCreateGroup = async () => {
+    const trimmedName = newGroupName.trim();
+    if (!trimmedName) return;
 
-    if (!response.ok) {
-      throw new Error("Failed to create group");
-    }
+    try {
+      const response = await fetch("/api/groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: trimmedName,
+          court: newGroupCourt,
+          time: newGroupTime,
+          maxMembers: 6,
+        }),
+      });
 
-    const data = await response.json();
-    if (data?.group) {
-      setGroups((prev) => [data.group, ...prev]);
+      if (!response.ok) {
+        throw new Error("Unable to create group");
+      }
+
+      const data = await response.json();
+      const created = data?.group;
+
+      let createdGroup = created;
+      if (created && newGroupMemberIds.length > 0) {
+        const patchResponse = await fetch(`/api/groups/${created._id || created.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ addMemberIds: newGroupMemberIds }),
+        });
+        if (patchResponse.ok) {
+          const patched = await patchResponse.json();
+          createdGroup = patched?.group || created;
+        }
+      }
+
+      setGroups((prev) => [createdGroup, ...prev]);
+      setNewGroupName("");
+      setNewGroupMemberIds([]);
+      setShowCreate(false);
+    } catch (err) {
+      setError("Unable to create group.");
     }
-    console.info("Group created successfully");
+  };
+
+  const openEditGroup = (group) => {
+    setActiveModal({ type: "edit", groupId: group._id || group.id });
+    setEditGroupName(group.name || "");
+    setEditGroupCourt(group.court || "Court 1");
+    setEditGroupTime(group.time || "06:00 AM - 07:00 AM");
+    const members = Array.isArray(group.members) ? group.members : [];
+    const memberIds = members.map((member) =>
+      typeof member === "string" ? member : member?._id || member?.id
+    );
+    setEditGroupMemberIds(memberIds.filter(Boolean));
+  };
+
+  const openAddMember = (group) => {
+    setActiveModal({ type: "add", groupId: group._id || group.id });
+    setAddMemberIds([]);
+  };
+
+  const closeModal = () => {
+    setActiveModal(null);
+    setEditGroupName("");
+    setEditGroupCourt("");
+    setEditGroupTime("");
+    setEditGroupMemberIds([]);
+    setAddMemberIds([]);
+  };
+
+  const handleSaveGroup = async () => {
+    if (!activeModal?.groupId) return;
+    const trimmedName = editGroupName.trim();
+    if (!trimmedName) return;
+
+    try {
+      const response = await fetch(`/api/groups/${activeModal.groupId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: trimmedName,
+          court: editGroupCourt,
+          time: editGroupTime,
+          members: editGroupMemberIds,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to update group");
+      }
+
+      const data = await response.json();
+      const updated = data?.group;
+
+      setGroups((prev) =>
+        prev.map((group) =>
+          (group._id || group.id) === activeModal.groupId ? updated : group
+        )
+      );
+      closeModal();
+    } catch (err) {
+      setError("Unable to update group.");
+    }
+  };
+
+  const handleAddMember = async () => {
+    if (!activeModal?.groupId) return;
+    if (addMemberIds.length === 0) return;
+
+    try {
+      const response = await fetch(`/api/groups/${activeModal.groupId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ addMemberIds }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to add members");
+      }
+
+      const data = await response.json();
+      const updated = data?.group;
+
+      setGroups((prev) =>
+        prev.map((group) =>
+          (group._id || group.id) === activeModal.groupId ? updated : group
+        )
+      );
+      closeModal();
+    } catch (err) {
+      setError("Unable to add members.");
+    }
+  };
+
+  const handleRemoveMember = async (groupId, memberId) => {
+    try {
+      const response = await fetch(`/api/groups/${groupId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ removeMemberIds: [memberId] }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to remove member");
+      }
+
+      const data = await response.json();
+      const updated = data?.group;
+
+      setGroups((prev) =>
+        prev.map((group) =>
+          (group._id || group.id) === groupId ? updated : group
+        )
+      );
+    } catch (err) {
+      setError("Unable to remove member.");
+    }
+  };
+
+  const handleDeleteGroup = async (groupId) => {
+    try {
+      const response = await fetch(`/api/groups/${groupId}`, { method: "DELETE" });
+      if (!response.ok) {
+        throw new Error("Unable to delete group");
+      }
+      setGroups((prev) => prev.filter((group) => (group._id || group.id) !== groupId));
+    } catch (err) {
+      setError("Unable to delete group.");
+    }
   };
 
   return (
@@ -79,160 +235,276 @@ export default function AdminGroupsPage() {
       <AdminNavbar />
 
       <main className="ml-64 min-h-screen px-8 pb-12 pt-24">
-        <div className="mb-12 flex items-end justify-between">
+        <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h2 className="font-headline text-4xl font-black uppercase tracking-tight">
-              Group Management
+            <h2 className="font-headline text-3xl font-black uppercase tracking-tight">
+              Groups
             </h2>
             <p className="font-label text-sm tracking-wide text-on-surface-variant">
-              Orchestrate and optimize athlete collectives for peak court efficiency.
+              Assign members into court groups and manage team rosters.
             </p>
           </div>
           <button
-            className="kinetic-gradient flex items-center gap-2 rounded-md px-6 py-3 font-headline text-sm font-bold text-on-primary-fixed shadow-[0_10px_20px_rgba(142,255,113,0.2)] transition-all active:scale-95"
-            onClick={() => setOpen(true)}
+            className="rounded-md bg-(--admin-accent-2) px-4 py-2 text-xs font-semibold text-black"
+            onClick={() => setShowCreate((prev) => !prev)}
             type="button"
           >
-            <span
-              className="material-symbols-outlined"
-              style={{ fontVariationSettings: '"FILL" 1' }}
-            >
-              add
-            </span>
-            CREATE GROUP
+            + Create Group
           </button>
         </div>
 
-        <div className="mb-16 grid grid-cols-1 gap-6 md:grid-cols-4">
-          {stats.length === 0 ? (
-            <div className="glass-card rounded-lg p-6 text-sm text-on-surface-variant">
-              Group stats will appear once data is available.
-            </div>
-          ) : (
-            stats.map((stat) => (
-              <div key={stat.label} className="glass-card rounded-lg p-6">
-                <p className="mb-4 text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-                  {stat.label}
-                </p>
-                <h3 className={`font-headline text-4xl font-black ${stat.tone}`}>
-                  {stat.value}
-                </h3>
-                <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-surface-container-highest">
-                  <div className={`h-full ${stat.bar} ${stat.progress}`} />
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-          {groups.map((group, index) => (
-            <GroupCard key={group._id || group.id || index} {...mapGroupToCard(group, index)} />
-          ))}
-
-          {!loading && groups.length === 0 && (
-            <div className="glass-card flex h-full flex-col items-center justify-center gap-3 rounded-lg p-8 text-center">
-              <p className="text-sm font-semibold text-on-surface-variant">No groups yet</p>
-              <p className="text-xs text-stone-500">Create your first squad to get started.</p>
-            </div>
-          )}
-
-          {error && (
-            <div className="glass-card flex h-full flex-col items-center justify-center gap-2 rounded-lg p-8 text-center">
-              <p className="text-sm font-semibold text-error">{error}</p>
-            </div>
-          )}
-
-          <div className="glass-card flex flex-col items-center justify-between gap-8 rounded-lg border-2 border-dashed border-outline-variant/30 p-8 md:flex-row lg:col-span-2">
-            <div className="flex items-center gap-8">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full border-4 border-surface-container-low bg-surface-container-highest outline outline-2 outline-white/5">
-                <span className="material-symbols-outlined text-4xl text-stone-700">
-                  stadium
-                </span>
+        {showCreate && (
+          <div className="mb-10 rounded-xl border border-white/5 bg-[#141414] p-6">
+            <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto]">
+              <div>
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                  Group name
+                </label>
+                <input
+                  value={newGroupName}
+                  onChange={(event) => setNewGroupName(event.target.value)}
+                  placeholder="Group A"
+                  className="mt-2 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-4 py-2 text-sm text-white placeholder:text-white/30"
+                />
               </div>
               <div>
-                <h5 className="font-headline text-xl font-black tracking-tighter text-stone-400">
-                  No open slot data
-                </h5>
-                <p className="font-label text-sm text-stone-600">
-                  Add groups to start tracking empty courts.
-                </p>
+                <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                  Members
+                </label>
+                <select
+                  multiple
+                  value={newGroupMemberIds}
+                  onChange={(event) =>
+                    setNewGroupMemberIds(
+                      Array.from(event.target.selectedOptions).map((option) => option.value)
+                    )
+                  }
+                  className="mt-2 h-28 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-3 py-2 text-xs text-white"
+                >
+                  {members.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.name} {member.email ? `(${member.email})` : ""}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
-            <button className="rounded-md border-2 border-primary/20 px-8 py-4 text-xs font-black uppercase tracking-widest text-primary transition-all hover:bg-primary/5">
-              Quick Schedule
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-16 border-t border-white/5 pt-16">
-          <h4 className="mb-8 font-headline text-sm font-black uppercase tracking-[0.3em] text-on-surface-variant">
-            Performance Scorecards
-          </h4>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div className="group relative rounded-lg bg-surface-container-highest p-6">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                Group Retention
-              </p>
-              <div className="flex items-end gap-2">
-                <span className="font-headline text-4xl font-black text-primary">
-                  88%
-                </span>
-                <span className="mb-1 text-xs font-bold text-primary">▲ 4%</span>
+              <div className="flex flex-col gap-4">
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                    Court
+                  </label>
+                  <select
+                    value={newGroupCourt}
+                    onChange={(event) => setNewGroupCourt(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-3 py-2 text-xs text-white"
+                  >
+                    <option value="Court 1">Court 1</option>
+                    <option value="Court 2">Court 2</option>
+                    <option value="Court 3">Court 3</option>
+                    <option value="Court 4">Court 4</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                    Time slot
+                  </label>
+                  <input
+                    value={newGroupTime}
+                    onChange={(event) => setNewGroupTime(event.target.value)}
+                    className="mt-2 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-3 py-2 text-xs text-white"
+                    placeholder="06:00 AM - 07:00 AM"
+                  />
+                </div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 overflow-hidden rounded-b-lg">
-                <div className="kinetic-gradient h-full w-[88%] shadow-[0_0_10px_#8eff71]" />
-              </div>
-            </div>
-
-            <div className="group relative rounded-lg bg-surface-container-highest p-6">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                Waitlist Average
-              </p>
-              <div className="flex items-end gap-2">
-                <span className="font-headline text-4xl font-black text-secondary">
-                  4.2
-                </span>
-                <span className="mb-1 text-xs font-bold text-secondary">athletes</span>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 overflow-hidden rounded-b-lg">
-                <div className="h-full w-[42%] bg-secondary shadow-[0_0_10px_#00e3fd]" />
-              </div>
-            </div>
-
-            <div className="group relative rounded-lg bg-surface-container-highest p-6">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                Peak Hours
-              </p>
-              <div className="flex items-end gap-2">
-                <span className="font-headline text-4xl font-black text-white">
-                  06:00
-                </span>
-                <span className="mb-1 text-xs font-bold text-stone-500">Standard</span>
-              </div>
-              <div className="absolute bottom-0 left-0 right-0 h-1 overflow-hidden rounded-b-lg">
-                <div className="h-full w-full bg-white opacity-10" />
+              <div className="flex items-end">
+                <button
+                  onClick={handleCreateGroup}
+                  className="rounded-lg bg-(--admin-accent) px-4 py-2 text-xs font-semibold text-black"
+                  type="button"
+                >
+                  Save
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {loading ? (
+          <div className="rounded-xl border border-white/10 bg-[#141414] p-6 text-sm text-white/60">
+            Loading groups...
+          </div>
+        ) : null}
+
+        {!loading && groups.length === 0 ? (
+          <div className="rounded-xl border border-white/10 bg-[#141414] p-6 text-sm text-white/60">
+            No groups yet. Create your first group.
+          </div>
+        ) : null}
+
+        {groups.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            {groups.map((group, index) => {
+              const groupName = group.name || `Group ${index + 1}`;
+              const groupMembers = Array.isArray(group.members) ? group.members : [];
+              const groupId = group._id || group.id;
+              const memberLabels = groupMembers.map((memberId) => {
+                const resolved = members.find(
+                  (member) => member.id === memberId.toString()
+                );
+                return resolved || { id: memberId.toString(), name: "Member" };
+              });
+              const isFull = memberLabels.length >= (group.maxMembers || 6);
+
+              return (
+                <GroupCard
+                  key={groupId || index}
+                  badge={group.court || "Court"}
+                  time={group.time || "—"}
+                  title={groupName}
+                  capacity={memberLabels.length}
+                  capacityTotal={group.maxMembers || 6}
+                  members={memberLabels}
+                  isFull={isFull}
+                  onEdit={() => openEditGroup(group)}
+                  onAddMember={() => openAddMember(group)}
+                  onRemoveMember={(memberId) => handleRemoveMember(groupId, memberId)}
+                  onDelete={() => handleDeleteGroup(groupId)}
+                />
+              );
+            })}
+          </div>
+        ) : null}
+
+        {error ? (
+          <div className="mt-8 rounded-xl border border-white/10 bg-[#141414] p-6 text-center">
+            <p className="text-sm font-semibold text-error">{error}</p>
+          </div>
+        ) : null}
+
+        {activeModal ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
+            <div className="w-full max-w-lg rounded-xl border border-white/10 bg-[#141414] p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold">
+                    {activeModal.type === "edit" ? "Edit Group" : "Add Member"}
+                  </h3>
+                  <p className="text-sm text-white/40">
+                    {activeModal.type === "edit"
+                      ? "Update group name and members"
+                      : "Add a new member to this group"}
+                  </p>
+                </div>
+                <button onClick={closeModal} className="text-white/40 hover:text-white">
+                  ✕
+                </button>
+              </div>
+
+              {activeModal.type === "edit" ? (
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                      Group name
+                    </label>
+                    <input
+                      value={editGroupName}
+                      onChange={(event) => setEditGroupName(event.target.value)}
+                      className="mt-2 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-4 py-2 text-sm text-white placeholder:text-white/30"
+                      placeholder="Group A"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                      Members
+                    </label>
+                    <select
+                      multiple
+                      value={editGroupMemberIds}
+                      onChange={(event) =>
+                        setEditGroupMemberIds(
+                          Array.from(event.target.selectedOptions).map((option) => option.value)
+                        )
+                      }
+                      className="mt-2 h-28 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-3 py-2 text-xs text-white"
+                    >
+                      {members.map((member) => (
+                        <option key={member.id} value={member.id}>
+                          {member.name} {member.email ? `(${member.email})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                        Court
+                      </label>
+                      <select
+                        value={editGroupCourt}
+                        onChange={(event) => setEditGroupCourt(event.target.value)}
+                        className="mt-2 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-3 py-2 text-xs text-white"
+                      >
+                        <option value="Court 1">Court 1</option>
+                        <option value="Court 2">Court 2</option>
+                        <option value="Court 3">Court 3</option>
+                        <option value="Court 4">Court 4</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                        Time slot
+                      </label>
+                      <input
+                        value={editGroupTime}
+                        onChange={(event) => setEditGroupTime(event.target.value)}
+                        className="mt-2 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-3 py-2 text-xs text-white"
+                        placeholder="06:00 AM - 07:00 AM"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-6">
+                  <label className="text-xs font-semibold uppercase tracking-[0.2em] text-white/50">
+                    Add members
+                  </label>
+                  <select
+                    multiple
+                    value={addMemberIds}
+                    onChange={(event) =>
+                      setAddMemberIds(
+                        Array.from(event.target.selectedOptions).map((option) => option.value)
+                      )
+                    }
+                    className="mt-2 h-28 w-full rounded-lg border border-white/10 bg-[#0f0f0f] px-3 py-2 text-xs text-white"
+                  >
+                    {members.map((member) => (
+                      <option key={member.id} value={member.id}>
+                        {member.name} {member.email ? `(${member.email})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  onClick={closeModal}
+                  className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/70"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={activeModal.type === "edit" ? handleSaveGroup : handleAddMember}
+                  className="rounded-lg bg-(--admin-accent) px-4 py-2 text-sm font-semibold text-black"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </main>
-
-      <button className="kinetic-gradient fixed bottom-10 right-10 z-50 flex h-16 w-16 items-center justify-center rounded-full text-on-primary-fixed shadow-[0_20px_40px_rgba(0,0,0,0.4)] transition-all hover:scale-110 active:scale-90">
-        <span
-          className="material-symbols-outlined text-3xl"
-          style={{ fontVariationSettings: '"FILL" 1' }}
-        >
-          bolt
-        </span>
-      </button>
-
-      {open && (
-        <CreateGroupModal
-          onClose={() => setOpen(false)}
-          onCreate={handleCreateGroup}
-        />
-      )}
     </div>
   );
 }
