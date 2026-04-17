@@ -9,7 +9,7 @@ const MembershipSchema = new mongoose.Schema(
     endDate: { type: Date, required: true },
     slot: { type: String, required: true },
     courtId: { type: Number, required: true },
-    groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group", required: true },
+    groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
     status: { type: String, default: "active" },
   },
   { timestamps: true }

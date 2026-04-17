@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   LayoutGrid,
   Calendar,
@@ -24,6 +26,16 @@ const navItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const adminName = session?.user?.name || "Admin";
+  const adminImage = session?.user?.image;
+  const adminInitials = adminName
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <aside className="fixed left-0 top-0 z-50 h-screen w-64 border-r border-white/5 bg-[#0d0d0d] px-6 py-8">
@@ -31,9 +43,11 @@ export default function AdminSidebar() {
         <div className="flex items-center gap-2">
           <div className="h-10 w-10 rounded-xl bg-linear-to-br from-[#ff6b00] to-[#ffb347]" />
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.2em]">Kinetic Onyx</p>
-            <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
-              Elite Sports Club
+            <p className="text-display text-sm font-extrabold tracking-[0.32em] text-(--orange)">
+              NAMAKKAL
+            </p>
+            <p className="text-display text-xs font-bold tracking-[0.28em] text-white/85">
+              SPORT CLUB
             </p>
           </div>
         </div>
@@ -59,15 +73,28 @@ export default function AdminSidebar() {
           })}
         </nav>
 
-        <div className="mt-auto rounded-2xl bg-[#141414] p-4">
+        <Link href="/profile" className="mt-auto rounded-2xl bg-[#141414] p-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-full bg-[#262626]" />
+            {adminImage ? (
+              <Image
+                alt="Admin profile"
+                className="h-10 w-10 rounded-full object-cover"
+                src={adminImage}
+                width={40}
+                height={40}
+                sizes="40px"
+              />
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#262626] text-sm font-semibold text-white/80">
+                {adminInitials || "AD"}
+              </div>
+            )}
             <div>
-              <p className="text-sm font-semibold">Admin Console</p>
-              <p className="text-[10px] text-white/40">System Root</p>
+              <p className="text-sm font-semibold">{adminName}</p>
+              <p className="text-[10px] text-white/40">Administrator</p>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     </aside>
   );
